@@ -6,17 +6,19 @@ function loginDiscord() {
 }
 
 async function checkAuth() {
-  // Проверяем токен в URL (после редиректа с Discord)
+  // Читаем токен из URL (бэкенд редиректит сюда с ?token=...)
   const params = new URLSearchParams(window.location.search);
   const urlToken = params.get("token");
   if (urlToken) {
     localStorage.setItem("kac_token", urlToken);
-    // Убираем токен из URL
     window.history.replaceState({}, "", window.location.pathname);
   }
 
   const token = localStorage.getItem("kac_token");
-  if (!token) { showLogin(); return; }
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
 
   try {
     const res  = await fetch(BACKEND + "/auth/verify?token=" + token);
@@ -25,28 +27,22 @@ async function checkAuth() {
       showApp(data);
     } else {
       localStorage.removeItem("kac_token");
-      showLogin();
+      window.location.href = "login.html";
     }
   } catch {
-    showLogin();
+    // Бэкенд недоступен — показываем дашборд без проверки если токен есть
+    showApp({ username: "Offline", avatar: "", id: "" });
   }
 }
 
 async function logout() {
   localStorage.removeItem("kac_token");
-  showLogin();
-}
-
-function showLogin() {
-  document.getElementById("login-screen").style.display = "";
-  document.getElementById("app").style.display = "none";
+  window.location.href = "login.html";
 }
 
 function showApp(user) {
-  document.getElementById("login-screen").style.display = "none";
   document.getElementById("app").style.display = "flex";
 
-  // Показываем аватар и ник в сайдбаре
   const avatarUrl = user.avatar
     ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
     : `https://cdn.discordapp.com/embed/avatars/0.png`;
