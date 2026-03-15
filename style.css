@@ -272,3 +272,52 @@ tr:hover td { background: #13131a; }
 }
 .info-row span:first-child { color: var(--muted); }
 .info-row span:last-child  { color: var(--text); font-weight: 600; }
+
+/* ── Login screen ── */
+#login-screen {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+}
+.login-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  min-width: 320px;
+}
+.login-logo {
+  font-size: 28px; font-weight: 800; color: var(--accent);
+  display: flex; align-items: center; gap: 10px;
+}
+.login-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 8px; }
+.btn-discord {
+  display: flex; align-items: center; gap: 10px;
+  background: #5865F2; color: #fff; border: none;
+  border-radius: 10px; padding: 12px 28px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  transition: background .15s; width: 100%; justify-content: center;
+}
+.btn-discord:hover { background: #4752c4; }
+.login-note { font-size: 12px; color: var(--muted); }
+
+/* ── User in sidebar ── */
+.sidebar-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 8px;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; }
+.user-name   { font-size: 13px; color: var(--text); font-weight: 600; }
+
+/* ── Logout ── */
+.btn-logout {
+  background: transparent; border: 1px solid #3a1a1a;
+  color: var(--high); border-radius: 8px;
+  padding: 9px 18px; font-size: 13px; cursor: pointer;
+  transition: all .15s; width: fit-content;
+}
+.btn-logout:hover { background: #2a1010; }

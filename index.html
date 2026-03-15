@@ -8,107 +8,103 @@
 </head>
 <body>
 
-<nav class="sidebar">
-  <div class="logo">
-    <span class="logo-icon">⚔</span>
-    <span>KvenzikAC</span>
+<!-- ── Login screen ── -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo"><span>⚔</span> KvenzikAC</div>
+    <div class="login-subtitle">AI Античит панель</div>
+    <button class="btn-discord" onclick="loginDiscord()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.033.055a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
+      </svg>
+      Войти через Discord
+    </button>
+    <div class="login-note">Доступ только для администраторов</div>
   </div>
-  <ul>
-    <li id="nav-dashboard" class="active"><a href="#" onclick="showTab('dashboard')">
-      <span class="nav-icon">◈</span> Главная
-    </a></li>
-    <li id="nav-alerts"><a href="#" onclick="showTab('alerts')">
-      <span class="nav-icon">◉</span> Алерты
-    </a></li>
-    <li id="nav-config"><a href="#" onclick="showTab('config')">
-      <span class="nav-icon">◎</span> Настройки
-    </a></li>
-  </ul>
-  <div class="sidebar-footer">
-    <div class="status-dot" id="sidebar-dot"></div>
-    <span id="sidebar-status">Проверка...</span>
-  </div>
-</nav>
+</div>
 
-<main class="content">
+<!-- ── App ── -->
+<div id="app" style="display:none">
+  <nav class="sidebar">
+    <div class="logo"><span class="logo-icon">⚔</span><span>KvenzikAC</span></div>
+    <ul>
+      <li id="nav-dashboard" class="active"><a href="#" onclick="showTab('dashboard')"><span class="nav-icon">◈</span> Главная</a></li>
+      <li id="nav-alerts"><a href="#" onclick="showTab('alerts')"><span class="nav-icon">◉</span> Алерты</a></li>
+      <li id="nav-config"><a href="#" onclick="showTab('config')"><span class="nav-icon">◎</span> Настройки</a></li>
+    </ul>
+    <div class="sidebar-user" id="sidebar-user"></div>
+    <div class="sidebar-footer">
+      <div class="status-dot" id="sidebar-dot"></div>
+      <span id="sidebar-status">Проверка...</span>
+    </div>
+  </nav>
 
-  <!-- ── Dashboard ── -->
-  <div id="tab-dashboard">
-    <div class="page-header">
-      <h1>Главная</h1>
-      <button class="btn-refresh" onclick="refreshDashboard()">↻ Обновить</button>
+  <main class="content">
+    <!-- Dashboard -->
+    <div id="tab-dashboard">
+      <div class="page-header">
+        <h1>Главная</h1>
+        <button class="btn-refresh" onclick="refreshDashboard()">↻ Обновить</button>
+      </div>
+      <div class="cards">
+        <div class="card"><div class="card-label">Статус API</div><div class="card-value" id="api-status">—</div></div>
+        <div class="card"><div class="card-label">Модель</div><div class="card-value" id="model-status">—</div></div>
+        <div class="card"><div class="card-label">Фич в модели</div><div class="card-value" id="model-features">—</div></div>
+        <div class="card"><div class="card-label">Всего алертов</div><div class="card-value" id="alerts-total">—</div></div>
+      </div>
+      <div class="section-title">Последние алерты</div>
+      <table>
+        <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
+        <tbody id="recent-alerts-body"><tr><td colspan="3" class="empty">Нет данных</td></tr></tbody>
+      </table>
     </div>
 
-    <div class="cards">
-      <div class="card">
-        <div class="card-label">Статус API</div>
-        <div class="card-value" id="api-status">—</div>
+    <!-- Alerts -->
+    <div id="tab-alerts" style="display:none">
+      <div class="page-header">
+        <h1>Алерты</h1>
+        <div class="filters">
+          <input id="filter-player" type="text" placeholder="Фильтр по нику..." oninput="filterAlerts()"/>
+          <select id="filter-prob" onchange="filterAlerts()">
+            <option value="0">Все</option>
+            <option value="0.9">≥ 90%</option>
+            <option value="0.8">≥ 80%</option>
+            <option value="0.7">≥ 70%</option>
+          </select>
+          <button class="btn-refresh" onclick="loadAlerts()">↻</button>
+        </div>
       </div>
-      <div class="card">
-        <div class="card-label">Модель</div>
-        <div class="card-value" id="model-status">—</div>
-      </div>
-      <div class="card">
-        <div class="card-label">Фич в модели</div>
-        <div class="card-value" id="model-features">—</div>
-      </div>
-      <div class="card">
-        <div class="card-label">Всего алертов</div>
-        <div class="card-value" id="alerts-total">—</div>
-      </div>
+      <table>
+        <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
+        <tbody id="all-alerts-body"><tr><td colspan="3" class="empty">Загрузка...</td></tr></tbody>
+      </table>
+      <div id="alerts-count" class="alerts-count"></div>
     </div>
 
-    <div class="section-title">Последние алерты</div>
-    <table>
-      <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
-      <tbody id="recent-alerts-body"><tr><td colspan="3" class="empty">Нет данных</td></tr></tbody>
-    </table>
-  </div>
-
-  <!-- ── Alerts ── -->
-  <div id="tab-alerts" style="display:none">
-    <div class="page-header">
-      <h1>Алерты</h1>
-      <div class="filters">
-        <input id="filter-player" type="text" placeholder="Фильтр по нику..." oninput="filterAlerts()"/>
-        <select id="filter-prob" onchange="filterAlerts()">
-          <option value="0">Все</option>
-          <option value="0.9">≥ 90%</option>
-          <option value="0.8">≥ 80%</option>
-          <option value="0.7">≥ 70%</option>
-        </select>
-        <button class="btn-refresh" onclick="loadAlerts()">↻</button>
+    <!-- Config -->
+    <div id="tab-config" style="display:none">
+      <div class="page-header"><h1>Настройки</h1></div>
+      <div class="config-box">
+        <div class="config-group">
+          <label>Backend URL</label>
+          <input id="endpoint" type="text" placeholder="https://kvenzikac-backend.up.railway.app"/>
+          <div class="hint">Railway URL бэкенда</div>
+        </div>
+        <div class="config-group">
+          <label>API Key</label>
+          <input id="apikey" type="password" placeholder="dev-key"/>
+        </div>
+        <div class="config-actions">
+          <button class="btn-primary" onclick="saveConfig()">Сохранить и проверить</button>
+          <span id="config-msg"></span>
+        </div>
+        <div class="config-info" id="config-info"></div>
+        <hr style="border-color:#1c1c24; margin-top:8px"/>
+        <button class="btn-logout" onclick="logout()">Выйти из аккаунта</button>
       </div>
     </div>
-    <table>
-      <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
-      <tbody id="all-alerts-body"><tr><td colspan="3" class="empty">Загрузка...</td></tr></tbody>
-    </table>
-    <div id="alerts-count" class="alerts-count"></div>
-  </div>
-
-  <!-- ── Config ── -->
-  <div id="tab-config" style="display:none">
-    <div class="page-header"><h1>Настройки</h1></div>
-    <div class="config-box">
-      <div class="config-group">
-        <label>Backend URL</label>
-        <input id="endpoint" type="text" placeholder="http://localhost:8000"/>
-        <div class="hint">ngrok URL или адрес VPS</div>
-      </div>
-      <div class="config-group">
-        <label>API Key</label>
-        <input id="apikey" type="password" placeholder="dev-key"/>
-      </div>
-      <div class="config-actions">
-        <button class="btn-primary" onclick="saveConfig()">Сохранить и проверить</button>
-        <span id="config-msg"></span>
-      </div>
-      <div class="config-info" id="config-info"></div>
-    </div>
-  </div>
-
-</main>
+  </main>
+</div>
 
 <script src="app.js"></script>
 </body>

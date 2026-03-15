@@ -1,8 +1,56 @@
-// ── Storage ──────────────────────────────────────────────────────────────────
-function getEndpoint() { return localStorage.getItem("kac_endpoint") || "http://localhost:8000"; }
+const BACKEND = "https://kvenzikac-backend.up.railway.app";
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function loginDiscord() {
+  window.location.href = BACKEND + "/auth/login";
+}
+
+async function checkAuth() {
+  try {
+    const res  = await fetch(BACKEND + "/auth/me", { credentials: "include" });
+    const data = await res.json();
+    if (data.authenticated) {
+      showApp(data);
+    } else {
+      showLogin();
+    }
+  } catch {
+    showLogin();
+  }
+}
+
+async function logout() {
+  await fetch(BACKEND + "/auth/logout", { method: "POST", credentials: "include" });
+  showLogin();
+}
+
+function showLogin() {
+  document.getElementById("login-screen").style.display = "";
+  document.getElementById("app").style.display = "none";
+}
+
+function showApp(user) {
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("app").style.display = "flex";
+
+  // Показываем аватар и ник в сайдбаре
+  const avatarUrl = user.avatar
+    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+    : `https://cdn.discordapp.com/embed/avatars/0.png`;
+  document.getElementById("sidebar-user").innerHTML = `
+    <img src="${avatarUrl}" class="user-avatar" alt="avatar"/>
+    <span class="user-name">${user.username}</span>
+  `;
+
+  refreshDashboard();
+  setInterval(refreshDashboard, 10000);
+}
+
+// ── Storage ───────────────────────────────────────────────────────────────────
+function getEndpoint() { return localStorage.getItem("kac_endpoint") || BACKEND; }
 function getApiKey()   { return localStorage.getItem("kac_apikey")   || "dev-key"; }
 
-// ── Tabs ─────────────────────────────────────────────────────────────────────
+// ── Tabs ──────────────────────────────────────────────────────────────────────
 function showTab(name) {
   ["dashboard", "alerts", "config"].forEach(t => {
     document.getElementById("tab-" + t).style.display = t === name ? "" : "none";
@@ -36,46 +84,35 @@ function probBar(p) {
 }
 
 function setStatus(online) {
-  const dot  = document.getElementById("sidebar-dot");
-  const text = document.getElementById("sidebar-status");
-  dot.className  = "status-dot " + (online ? "online" : "offline");
-  text.textContent = online ? "Online" : "Offline";
+  document.getElementById("sidebar-dot").className = "status-dot " + (online ? "online" : "offline");
+  document.getElementById("sidebar-status").textContent = online ? "Online" : "Offline";
 }
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 async function refreshDashboard() {
-  const apiEl   = document.getElementById("api-status");
-  const modelEl = document.getElementById("model-status");
-  const featEl  = document.getElementById("model-features");
-  const totalEl = document.getElementById("alerts-total");
-  const tbody   = document.getElementById("recent-alerts-body");
-
   try {
-    const res  = await fetch(getEndpoint() + "/stats");
+    const res  = await fetch(getEndpoint() + "/stats", { credentials: "include" });
     const data = await res.json();
-
-    apiEl.textContent   = "Online";
-    apiEl.className     = "card-value ok";
-    modelEl.textContent = data.model_loaded ? "Загружена ✓" : "Не загружена";
-    modelEl.className   = "card-value " + (data.model_loaded ? "ok" : "err");
-    featEl.textContent  = data.n_features ?? "—";
-    totalEl.textContent = data.alerts_total ?? "0";
+    document.getElementById("api-status").textContent   = "Online";
+    document.getElementById("api-status").className     = "card-value ok";
+    document.getElementById("model-status").textContent = data.model_loaded ? "Загружена ✓" : "Не загружена";
+    document.getElementById("model-status").className   = "card-value " + (data.model_loaded ? "ok" : "err");
+    document.getElementById("model-features").textContent = data.n_features ?? "—";
+    document.getElementById("alerts-total").textContent   = data.alerts_total ?? "0";
     setStatus(true);
   } catch {
-    apiEl.textContent = "Offline";
-    apiEl.className   = "card-value err";
+    document.getElementById("api-status").textContent = "Offline";
+    document.getElementById("api-status").className   = "card-value err";
     setStatus(false);
   }
 
+  const tbody = document.getElementById("recent-alerts-body");
   try {
-    const res  = await fetch(getEndpoint() + "/alerts?api_key=" + getApiKey());
+    const res  = await fetch(getEndpoint() + "/alerts?api_key=" + getApiKey(), { credentials: "include" });
     const data = await res.json();
     tbody.innerHTML = "";
     const list = data.alerts.slice(0, 10);
-    if (!list.length) {
-      tbody.innerHTML = "<tr><td colspan='3' class='empty'>Алертов нет</td></tr>";
-      return;
-    }
+    if (!list.length) { tbody.innerHTML = "<tr><td colspan='3' class='empty'>Алертов нет</td></tr>"; return; }
     list.forEach(a => {
       const tr = document.createElement("tr");
       tr.innerHTML = `<td class="player-cell">${a.player}</td><td>${probBar(a.probability)}</td><td class="time-cell">${formatTime(a.time)}</td>`;
@@ -93,7 +130,7 @@ async function loadAlerts() {
   const tbody = document.getElementById("all-alerts-body");
   tbody.innerHTML = "<tr><td colspan='3' class='empty'>Загрузка...</td></tr>";
   try {
-    const res  = await fetch(getEndpoint() + "/alerts?api_key=" + getApiKey());
+    const res  = await fetch(getEndpoint() + "/alerts?api_key=" + getApiKey(), { credentials: "include" });
     const data = await res.json();
     allAlerts = data.alerts || [];
     filterAlerts();
@@ -103,21 +140,13 @@ async function loadAlerts() {
 }
 
 function filterAlerts() {
-  const tbody     = document.getElementById("all-alerts-body");
-  const countEl   = document.getElementById("alerts-count");
-  const playerQ   = document.getElementById("filter-player").value.toLowerCase();
-  const minProb   = parseFloat(document.getElementById("filter-prob").value) || 0;
-
-  const filtered = allAlerts.filter(a =>
-    a.player.toLowerCase().includes(playerQ) && a.probability >= minProb
-  );
-
+  const tbody   = document.getElementById("all-alerts-body");
+  const countEl = document.getElementById("alerts-count");
+  const playerQ = document.getElementById("filter-player").value.toLowerCase();
+  const minProb = parseFloat(document.getElementById("filter-prob").value) || 0;
+  const filtered = allAlerts.filter(a => a.player.toLowerCase().includes(playerQ) && a.probability >= minProb);
   tbody.innerHTML = "";
-  if (!filtered.length) {
-    tbody.innerHTML = "<tr><td colspan='3' class='empty'>Нет совпадений</td></tr>";
-    countEl.textContent = "";
-    return;
-  }
+  if (!filtered.length) { tbody.innerHTML = "<tr><td colspan='3' class='empty'>Нет совпадений</td></tr>"; countEl.textContent = ""; return; }
   filtered.forEach(a => {
     const tr = document.createElement("tr");
     tr.innerHTML = `<td class="player-cell">${a.player}</td><td>${probBar(a.probability)}</td><td class="time-cell">${formatTime(a.time)}</td>`;
@@ -139,33 +168,22 @@ async function saveConfig() {
   const ak  = document.getElementById("apikey").value.trim();
   const msg = document.getElementById("config-msg");
   const info = document.getElementById("config-info");
-
   if (ep) localStorage.setItem("kac_endpoint", ep);
   if (ak) localStorage.setItem("kac_apikey", ak);
-
-  msg.textContent  = "Проверяю...";
-  msg.className    = "";
-  info.innerHTML   = "";
-
+  msg.textContent = "Проверяю..."; msg.className = "";
   try {
-    const res  = await fetch(ep + "/stats");
+    const res  = await fetch(ep + "/stats", { credentials: "include" });
     const data = await res.json();
-    msg.textContent = "✓ Подключено";
-    msg.className   = "ok";
-    info.innerHTML  = `
+    msg.textContent = "✓ Подключено"; msg.className = "ok";
+    info.innerHTML = `
       <div class="info-row"><span>Версия API</span><span>${data.api_version ?? "—"}</span></div>
       <div class="info-row"><span>Модель</span><span>${data.model_loaded ? "Загружена" : "Не загружена"}</span></div>
       <div class="info-row"><span>Фич</span><span>${data.n_features ?? "—"}</span></div>
-      <div class="info-row"><span>Алертов</span><span>${data.alerts_total ?? 0}</span></div>
-    `;
+      <div class="info-row"><span>Алертов</span><span>${data.alerts_total ?? 0}</span></div>`;
   } catch {
-    msg.textContent = "✗ Не удалось подключиться";
-    msg.className   = "err";
+    msg.textContent = "✗ Не удалось подключиться"; msg.className = "err";
   }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", () => {
-  refreshDashboard();
-  setInterval(refreshDashboard, 10000);
-});
+document.addEventListener("DOMContentLoaded", checkAuth);
