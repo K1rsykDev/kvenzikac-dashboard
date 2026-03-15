@@ -80,7 +80,7 @@ function getEndpoint() { return localStorage.getItem("kac_endpoint") || BACKEND;
 function getApiKey()   { return localStorage.getItem("kac_apikey")   || "dev-key"; }
 
 // ── Tabs ──────────────────────────────────────────────────────────────────────
-const TABS = ["dashboard", "alerts", "players", "config"];
+const TABS = ["dashboard", "alerts", "players", "bans", "config"];
 
 function showTab(name) {
   TABS.forEach(t => {
@@ -92,6 +92,7 @@ function showTab(name) {
   if (name === "dashboard") refreshDashboard();
   if (name === "alerts")    loadAlerts();
   if (name === "players")   loadPlayers();
+  if (name === "bans")      loadBans();
   if (name === "config")    loadConfigTab();
 }
 
@@ -238,6 +239,8 @@ async function refreshDashboard() {
     document.getElementById("model-status").className   = "card-value " + (data.model_loaded ? "ok" : "err");
     document.getElementById("model-features").textContent = data.n_features ?? "—";
     document.getElementById("alerts-total").textContent   = data.alerts_total ?? "0";
+    const bansEl = document.getElementById("bans-total");
+    if (bansEl) bansEl.textContent = data.bans_total ?? "0";
     setStatus(true);
   } catch {
     document.getElementById("api-status").textContent = "Offline";
@@ -386,6 +389,62 @@ async function loadPlayers() {
   } catch {
     grid.innerHTML = `<div class="empty" style="grid-column:1/-1">Ошибка подключения</div>`;
   }
+}
+
+// ── Bans ──────────────────────────────────────────────────────────────────────
+let allBans = [];
+
+async function loadBans() {
+  const tbody = document.getElementById("bans-body");
+  if (tbody) tbody.innerHTML = "<tr><td colspan='5' class='empty'>Загрузка...</td></tr>";
+  try {
+    const res  = await fetch(getEndpoint() + "/bans?api_key=" + getApiKey());
+    const data = await res.json();
+    allBans = data.bans || [];
+    const sub = document.getElementById("bans-subtitle");
+    if (sub) sub.textContent = `${allBans.length} записей`;
+    // Badge
+    const badge = document.getElementById("nav-bans-badge");
+    if (badge) {
+      badge.textContent = allBans.length;
+      badge.style.display = allBans.length > 0 ? "" : "none";
+    }
+    filterBans();
+  } catch {
+    if (tbody) tbody.innerHTML = "<tr><td colspan='5' class='empty'>Ошибка подключения</td></tr>";
+  }
+}
+
+function filterBans() {
+  const tbody    = document.getElementById("bans-body");
+  const countEl  = document.getElementById("bans-count");
+  const playerQ  = (document.getElementById("filter-ban-player")?.value || "").toLowerCase();
+  const checkQ   = (document.getElementById("filter-ban-check")?.value || "").toLowerCase();
+
+  const filtered = allBans.filter(b =>
+    b.player.toLowerCase().includes(playerQ) &&
+    (!checkQ || (b.check || "").toLowerCase() === checkQ)
+  );
+
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (!filtered.length) {
+    tbody.innerHTML = "<tr><td colspan='5' class='empty'>Нет совпадений</td></tr>";
+    if (countEl) countEl.textContent = "";
+    return;
+  }
+  filtered.forEach(b => {
+    const tr = document.createElement("tr");
+    const checkBadge = `<span class="check-badge check-${(b.check||'AI').toLowerCase()}">${b.check || 'AI'}</span>`;
+    tr.innerHTML = `
+      <td class="player-cell">${b.player}</td>
+      <td>${checkBadge}</td>
+      <td>${probBar(b.probability)}</td>
+      <td class="reason-cell">${b.reason || '—'}</td>
+      <td class="time-cell">${formatTime(b.time)}</td>`;
+    tbody.appendChild(tr);
+  });
+  if (countEl) countEl.textContent = `Показано: ${filtered.length} из ${allBans.length}`;
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────

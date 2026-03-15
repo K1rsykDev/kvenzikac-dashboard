@@ -227,6 +227,8 @@ body {
 .card-icon-blue svg   { stroke: var(--blue); }
 .card-icon-red    { background: var(--high-dim);  }
 .card-icon-red svg    { stroke: var(--high); }
+.card-icon-orange { background: rgba(251,146,60,.12); }
+.card-icon-orange svg { stroke: #fb923c; }
 
 .card-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .card-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: .6px; }
@@ -636,4 +638,34 @@ tr:hover td { background: var(--surface2); }
   padding-top: 4px;
   border-top: 1px solid var(--border);
   width: 100%;
+}
+
+/* ── Check badges (bans) ── */
+.check-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.check-ai     { background: var(--purple-dim); color: var(--accent); }
+.check-speed  { background: var(--blue-dim);   color: var(--blue); }
+.check-fly    { background: var(--warn-dim);   color: var(--warn); }
+.check-reach  { background: var(--high-dim);   color: var(--high); }
+
+.reason-cell { font-size: 12px; color: var(--text2); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── Nav badge red variant ── */
+.nav-badge-red { background: var(--crit); }
+
+/* ── Cards 5-col when needed ── */
+@media (max-width: 1200px) {
+  .cards { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 800px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+  .config-layout { grid-template-columns: 1fr; }
 }
