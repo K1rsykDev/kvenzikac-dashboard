@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KvenzikAC</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="logo">
+    <span class="logo-icon">⚔</span>
+    <span>KvenzikAC</span>
+  </div>
+  <ul>
+    <li id="nav-dashboard" class="active"><a href="#" onclick="showTab('dashboard')">
+      <span class="nav-icon">◈</span> Главная
+    </a></li>
+    <li id="nav-alerts"><a href="#" onclick="showTab('alerts')">
+      <span class="nav-icon">◉</span> Алерты
+    </a></li>
+    <li id="nav-config"><a href="#" onclick="showTab('config')">
+      <span class="nav-icon">◎</span> Настройки
+    </a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="status-dot" id="sidebar-dot"></div>
+    <span id="sidebar-status">Проверка...</span>
+  </div>
+</nav>
+
+<main class="content">
+
+  <!-- ── Dashboard ── -->
+  <div id="tab-dashboard">
+    <div class="page-header">
+      <h1>Главная</h1>
+      <button class="btn-refresh" onclick="refreshDashboard()">↻ Обновить</button>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Статус API</div>
+        <div class="card-value" id="api-status">—</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Модель</div>
+        <div class="card-value" id="model-status">—</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Фич в модели</div>
+        <div class="card-value" id="model-features">—</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Всего алертов</div>
+        <div class="card-value" id="alerts-total">—</div>
+      </div>
+    </div>
+
+    <div class="section-title">Последние алерты</div>
+    <table>
+      <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
+      <tbody id="recent-alerts-body"><tr><td colspan="3" class="empty">Нет данных</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- ── Alerts ── -->
+  <div id="tab-alerts" style="display:none">
+    <div class="page-header">
+      <h1>Алерты</h1>
+      <div class="filters">
+        <input id="filter-player" type="text" placeholder="Фильтр по нику..." oninput="filterAlerts()"/>
+        <select id="filter-prob" onchange="filterAlerts()">
+          <option value="0">Все</option>
+          <option value="0.9">≥ 90%</option>
+          <option value="0.8">≥ 80%</option>
+          <option value="0.7">≥ 70%</option>
+        </select>
+        <button class="btn-refresh" onclick="loadAlerts()">↻</button>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
+      <tbody id="all-alerts-body"><tr><td colspan="3" class="empty">Загрузка...</td></tr></tbody>
+    </table>
+    <div id="alerts-count" class="alerts-count"></div>
+  </div>
+
+  <!-- ── Config ── -->
+  <div id="tab-config" style="display:none">
+    <div class="page-header"><h1>Настройки</h1></div>
+    <div class="config-box">
+      <div class="config-group">
+        <label>Backend URL</label>
+        <input id="endpoint" type="text" placeholder="http://localhost:8000"/>
+        <div class="hint">ngrok URL или адрес VPS</div>
+      </div>
+      <div class="config-group">
+        <label>API Key</label>
+        <input id="apikey" type="password" placeholder="dev-key"/>
+      </div>
+      <div class="config-actions">
+        <button class="btn-primary" onclick="saveConfig()">Сохранить и проверить</button>
+        <span id="config-msg"></span>
+      </div>
+      <div class="config-info" id="config-info"></div>
+    </div>
+  </div>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
