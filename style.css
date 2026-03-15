@@ -877,3 +877,80 @@ tr:hover td { background: var(--surface2); }
   .conn-layout { grid-template-columns: 1fr; }
   .pricing-cards { grid-template-columns: 1fr; }
 }
+
+/* Trial */
+.btn-trial {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #3b82f6);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-trial:hover { opacity: .85; }
+.btn-trial:disabled { opacity: .5; cursor: not-allowed; }
+.trial-used {
+  font-size: 13px;
+  color: var(--text2);
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  text-align: center;
+}
+.trial-active {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 14px;
+  background: var(--ok-dim);
+  border: 1px solid rgba(74,222,128,.2);
+  border-radius: 9px;
+  text-align: center;
+}
+
+/* Plan badges */
+.plan-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+.plan-none    { background: var(--surface2); color: var(--muted); }
+.plan-free    { background: var(--ok-dim);   color: var(--ok); }
+.plan-basic   { background: var(--blue-dim); color: var(--blue); }
+.plan-premium { background: rgba(251,191,36,.12); color: var(--warn); }
+
+/* Buy button */
+.btn-buy {
+  width: 100%;
+  margin-top: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: 9px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-buy:hover { border-color: var(--accent); color: var(--accent); }
+.pricing-card-accent .btn-buy {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.pricing-card-accent .btn-buy:hover { background: var(--accent2); }
+.btn-buy-trial {
+  background: linear-gradient(135deg, var(--accent), #3b82f6);
+  border: none;
+  color: #fff;
+}
+.btn-buy-trial:hover { opacity: .85; }

@@ -201,6 +201,10 @@
             <span id="conn-sub-days">—</span>
           </div>
           <div class="conn-info-row">
+            <div class="conn-info-label">Тариф</div>
+            <span id="conn-plan">—</span>
+          </div>
+          <div class="conn-info-row">
             <div class="conn-info-label">Срок действия</div>
             <span id="conn-expires">—</span>
           </div>
@@ -222,6 +226,7 @@
             <label>Название сервера</label>
             <input id="conn-server-name" type="text" placeholder="Мой сервер"/>
           </div>
+          <div id="trial-block" style="margin-top:4px"></div>
           <div class="config-actions" style="margin-top:4px">
             <button class="btn-primary" onclick="generateKey()" id="btn-gen-key">Сгенерировать ключ</button>
             <button class="btn-secondary" onclick="loadConnectionTab()">↻ Обновить</button>
@@ -253,6 +258,7 @@
                 <li>✓ Дашборд</li>
                 <li>✓ Алерты и баны</li>
               </ul>
+              <div id="pricing-trial-btn" style="margin-top:12px"></div>
             </div>
             <div class="pricing-card pricing-card-accent">
               <div class="pricing-name">Базовый</div>
@@ -263,6 +269,7 @@
                 <li>✓ Приоритетная поддержка</li>
                 <li>✓ Обновления модели</li>
               </ul>
+              <button class="btn-buy" onclick="alert('Напишите администратору для покупки Basic')">Купить</button>
             </div>
             <div class="pricing-card">
               <div class="pricing-name">Премиум</div>
@@ -273,9 +280,10 @@
                 <li>✓ Кастомные пороги</li>
                 <li>✓ Ранний доступ</li>
               </ul>
+              <button class="btn-buy" onclick="alert('Напишите администратору для покупки Premium')">Купить</button>
             </div>
           </div>
-          <div class="hint" style="margin-top:12px">Для покупки обратитесь к администратору или напишите в Discord.</div>
+          <div class="hint" style="margin-top:12px">Для покупки напишите в Discord администратору.</div>
         </div>
       </div>
     </div>
@@ -312,8 +320,8 @@
       <div class="panel" style="margin-bottom:20px">
         <div class="panel-header"><span class="panel-title">Пользователи</span></div>
         <table>
-          <thead><tr><th>Ник</th><th>Discord ID</th><th>Роль</th><th>Подписка</th><th>Сервер</th><th>Действия</th></tr></thead>
-          <tbody id="admin-users-body"><tr><td colspan="6" class="empty">Загрузка...</td></tr></tbody>
+          <thead><tr><th>Ник</th><th>Discord ID</th><th>Роль</th><th>Тариф</th><th>Подписка</th><th>Сервер</th><th>Действия</th></tr></thead>
+          <tbody id="admin-users-body"><tr><td colspan="7" class="empty">Загрузка...</td></tr></tbody>
         </table>
       </div>
 

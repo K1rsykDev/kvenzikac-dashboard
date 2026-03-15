@@ -490,6 +490,60 @@ async function loadConnectionTab() {
     subEl.textContent = (currentUser.sub_days || 0) + " дней";
     subEl.className = (currentUser.sub_days > 0) ? "ok" : "err";
   }
+
+  // Кнопка пробного периода
+  var trialBlock = document.getElementById("trial-block");
+  if (trialBlock && currentUser) {
+    if (currentUser.trial_used) {
+      trialBlock.innerHTML = '<div class="trial-used">Пробный период уже использован. Для продления обратитесь к администратору.</div>';
+    } else if ((currentUser.sub_days || 0) > 0) {
+      trialBlock.innerHTML = '<div class="trial-active ok">Подписка активна (' + currentUser.sub_days + ' дней)</div>';
+    } else {
+      trialBlock.innerHTML = '<button class="btn-trial" onclick="activateTrial()">🎁 Активировать пробный период (3 дня)</button>';
+    }
+  }
+
+  // Кнопка "Испытать" в карточке тарифа
+  var pricingTrialBtn = document.getElementById("pricing-trial-btn");
+  if (pricingTrialBtn && currentUser) {
+    if (currentUser.trial_used) {
+      pricingTrialBtn.innerHTML = '<div style="font-size:12px;color:var(--muted);text-align:center">Уже использован</div>';
+    } else if ((currentUser.sub_days || 0) > 0) {
+      pricingTrialBtn.innerHTML = '<div style="font-size:12px;color:var(--ok);text-align:center">✓ Активен</div>';
+    } else {
+      pricingTrialBtn.innerHTML = '<button class="btn-buy btn-buy-trial" onclick="activateTrial()">Испытать</button>';
+    }
+  }
+
+  // Показываем план
+  var planEl = document.getElementById("conn-plan");
+  if (planEl && currentUser) {
+    var planNames = { none: "Нет подписки", free: "Free (пробный)", basic: "Basic", premium: "Premium", admin: "Admin" };
+    var planKey = currentUser.role === "admin" ? "admin" : (currentUser.plan || "none");
+    planEl.textContent = planNames[planKey] || planKey;
+    planEl.className = planKey === "none" ? "err" : "ok";
+  }
+}
+
+async function activateTrial() {
+  var btn = document.querySelector(".btn-trial");
+  if (btn) btn.disabled = true;
+  try {
+    var res  = await fetch(BACKEND + "/trial/activate", { method: "POST", headers: authHeaders() });
+    var data = await res.json();
+    if (!res.ok) {
+      alert("Ошибка: " + (data.detail || res.status));
+      if (btn) btn.disabled = false;
+      return;
+    }
+    // Обновляем currentUser
+    currentUser.sub_days = data.sub_days;
+    currentUser.trial_used = true;
+    await loadConnectionTab();
+  } catch(e) {
+    alert("Ошибка подключения");
+    if (btn) btn.disabled = false;
+  }
 }
 
 async function generateKey() {
@@ -506,7 +560,7 @@ async function generateKey() {
     });
     var data = await res.json();
     if (!res.ok) {
-      alert("Ошибка: " + (data.detail || res.status));
+      alert((res.status === 409 ? "⚠️ " : "Ошибка: ") + (data.detail || res.status));
     } else {
       await loadConnectionTab();
     }
@@ -578,21 +632,26 @@ async function loadAdminTab() {
 async function loadAdminUsers() {
   var tbody = document.getElementById("admin-users-body");
   if (!tbody) return;
-  tbody.innerHTML = "<tr><td colspan='6' class='empty'>Загрузка...</td></tr>";
+  tbody.innerHTML = "<tr><td colspan='7' class='empty'>Загрузка...</td></tr>";
   try {
     var res  = await fetch(BACKEND + "/admin/users", { headers: authHeaders() });
     var data = await res.json();
     var users = data.users || [];
-    if (!users.length) { tbody.innerHTML = "<tr><td colspan='6' class='empty'>Нет пользователей</td></tr>"; return; }
+    if (!users.length) { tbody.innerHTML = "<tr><td colspan='7' class='empty'>Нет пользователей</td></tr>"; return; }
     tbody.innerHTML = "";
+    var planNames = { none: "—", free: "Free", basic: "Basic", premium: "Premium" };
     users.forEach(function(u) {
       var tr = document.createElement("tr");
       var roleBadge = '<span class="check-badge ' + (u.role === "admin" ? "check-ban" : "check-ai") + '">' + u.role + '</span>';
+      var planBadge = u.role === "admin"
+        ? '<span class="check-badge check-ban">Admin</span>'
+        : '<span class="plan-badge plan-' + (u.plan || "none") + '">' + (planNames[u.plan] || "—") + '</span>';
       var subColor = u.sub_days > 0 ? "ok" : "err";
       tr.innerHTML =
         "<td class='player-cell'>" + u.username + "</td>" +
         "<td style='font-size:11px;color:var(--muted)'>" + u.discord_id + "</td>" +
         "<td>" + roleBadge + "</td>" +
+        "<td>" + planBadge + "</td>" +
         "<td><span class='" + subColor + "'>" + u.sub_days + " дней</span></td>" +
         "<td>" + (u.server_name || "—") + "</td>" +
         "<td class='admin-actions'>" +
@@ -605,7 +664,7 @@ async function loadAdminUsers() {
       tbody.appendChild(tr);
     });
   } catch(e) {
-    tbody.innerHTML = "<tr><td colspan='6' class='empty'>Ошибка загрузки</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='7' class='empty'>Ошибка загрузки</td></tr>";
   }
 }
 
