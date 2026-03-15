@@ -6,12 +6,25 @@ function loginDiscord() {
 }
 
 async function checkAuth() {
+  // Проверяем токен в URL (после редиректа с Discord)
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get("token");
+  if (urlToken) {
+    localStorage.setItem("kac_token", urlToken);
+    // Убираем токен из URL
+    window.history.replaceState({}, "", window.location.pathname);
+  }
+
+  const token = localStorage.getItem("kac_token");
+  if (!token) { showLogin(); return; }
+
   try {
-    const res  = await fetch(BACKEND + "/auth/me", { credentials: "include" });
+    const res  = await fetch(BACKEND + "/auth/verify?token=" + token);
     const data = await res.json();
     if (data.authenticated) {
       showApp(data);
     } else {
+      localStorage.removeItem("kac_token");
       showLogin();
     }
   } catch {
@@ -20,7 +33,7 @@ async function checkAuth() {
 }
 
 async function logout() {
-  await fetch(BACKEND + "/auth/logout", { method: "POST", credentials: "include" });
+  localStorage.removeItem("kac_token");
   showLogin();
 }
 
