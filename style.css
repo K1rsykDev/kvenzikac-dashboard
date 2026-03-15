@@ -669,3 +669,51 @@ tr:hover td { background: var(--surface2); }
   .grid-2 { grid-template-columns: 1fr; }
   .config-layout { grid-template-columns: 1fr; }
 }
+
+/* ── Retrain / train section ── */
+.train-stats {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.train-error {
+  font-size: 12px;
+  color: var(--high);
+  padding: 6px 0 0;
+}
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger {
+  background: transparent;
+  color: var(--high);
+  border: 1px solid rgba(239,68,68,.3);
+  border-radius: 9px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-danger:hover { background: var(--high-dim); border-color: var(--high); }
+.config-group code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 12px;
+  color: var(--accent);
+}

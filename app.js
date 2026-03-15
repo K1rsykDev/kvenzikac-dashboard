@@ -93,7 +93,7 @@ function showTab(name) {
   if (name === "alerts")    loadAlerts();
   if (name === "players")   loadPlayers();
   if (name === "bans")      loadBans();
-  if (name === "config")    loadConfigTab();
+  if (name === "config")    { loadConfigTab(); refreshTrainStatus(); }
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -494,6 +494,57 @@ function toggleApiKey() {
   const input = document.getElementById("apikey");
   if (!input) return;
   input.type = input.type === "password" ? "text" : "password";
+}
+
+// ── Retrain ───────────────────────────────────────────────────────────────────
+async function refreshTrainStatus() {
+  try {
+    const res  = await fetch(getEndpoint() + "/retrain/status?api_key=" + getApiKey());
+    const data = await res.json();
+    const samplesEl  = document.getElementById("train-samples");
+    const lastEl     = document.getElementById("train-last");
+    const runningEl  = document.getElementById("train-running");
+    const errorEl    = document.getElementById("train-error");
+    if (samplesEl) samplesEl.textContent = data.samples ?? "0";
+    if (lastEl)    lastEl.textContent    = data.last ? formatTime(data.last) : "Никогда";
+    if (runningEl) {
+      runningEl.textContent  = data.running ? "⏳ Обучается..." : "Готово";
+      runningEl.style.color  = data.running ? "var(--warn)" : "var(--ok)";
+    }
+    if (errorEl) {
+      if (data.error) { errorEl.textContent = "Ошибка: " + data.error; errorEl.style.display = ""; }
+      else errorEl.style.display = "none";
+    }
+    const btn = document.getElementById("btn-retrain");
+    if (btn) btn.disabled = data.running;
+  } catch { /* offline */ }
+}
+
+async function doRetrain() {
+  const btn = document.getElementById("btn-retrain");
+  if (btn) btn.disabled = true;
+  try {
+    const res  = await fetch(getEndpoint() + "/retrain?api_key=" + getApiKey(), { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) { alert("Ошибка: " + (data.detail || res.status)); if (btn) btn.disabled = false; return; }
+    // Поллим статус каждые 2 секунды
+    const poll = setInterval(async () => {
+      await refreshTrainStatus();
+      const s = await fetch(getEndpoint() + "/retrain/status?api_key=" + getApiKey()).then(r => r.json());
+      if (!s.running) clearInterval(poll);
+    }, 2000);
+  } catch (e) {
+    alert("Ошибка подключения");
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function clearLabels() {
+  if (!confirm("Удалить все размеченные сэмплы?")) return;
+  try {
+    await fetch(getEndpoint() + "/label/clear?api_key=" + getApiKey(), { method: "DELETE" });
+    await refreshTrainStatus();
+  } catch { alert("Ошибка подключения"); }
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

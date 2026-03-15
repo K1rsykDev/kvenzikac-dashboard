@@ -246,8 +246,7 @@
       </div>
       <div class="config-layout">
         <div class="config-box">
-          <div class="config-section-title">Подключение</div>
-          <div class="config-group">
+          <div class="config-section-title">Подключение</div>          <div class="config-group">
             <label>Backend URL</label>
             <input id="endpoint" type="text" placeholder="https://kvenzikac-backend.up.railway.app"/>
             <div class="hint">Railway URL бэкенда</div>
@@ -268,8 +267,22 @@
           <div class="config-info" id="config-info"></div>
         </div>
         <div class="config-box">
-          <div class="config-section-title">Аккаунт</div>
-          <div id="account-info" class="account-info"></div>
+          <div class="config-section-title">Дообучение модели</div>
+          <div class="train-stats" id="train-stats">
+            <div class="info-row"><span>Размеченных сэмплов</span><span id="train-samples">—</span></div>
+            <div class="info-row"><span>Последнее обучение</span><span id="train-last">—</span></div>
+            <div class="info-row"><span>Статус</span><span id="train-running">—</span></div>
+            <div id="train-error" class="train-error" style="display:none"></div>
+          </div>
+          <div class="config-actions" style="flex-wrap:wrap; gap:8px; margin-top:4px">
+            <button class="btn-primary" onclick="doRetrain()" id="btn-retrain">▶ Переобучить</button>
+            <button class="btn-secondary" onclick="refreshTrainStatus()">↻ Статус</button>
+            <button class="btn-danger" onclick="clearLabels()">✕ Очистить</button>
+          </div>
+          <div class="hint" style="margin-top:8px">Мин. 10 сэмплов. Разметка: <code>/kac label &lt;игрок&gt; &lt;cheat|legit&gt;</code></div>
+        </div>
+        <div class="config-box">
+          <div class="config-section-title">Аккаунт</div>          <div id="account-info" class="account-info"></div>
           <button class="btn-logout" onclick="logout()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             Выйти из аккаунта
