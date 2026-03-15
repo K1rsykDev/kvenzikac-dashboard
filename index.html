@@ -5,88 +5,229 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>KvenzikAC</title>
 <link rel="stylesheet" href="style.css"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
 <div id="app" style="display:none">
   <nav class="sidebar">
-    <div class="logo"><span class="logo-icon">⚔</span><span>KvenzikAC</span></div>
-    <ul>
-      <li id="nav-dashboard" class="active"><a href="#" onclick="showTab('dashboard')"><span class="nav-icon">◈</span> Главная</a></li>
-      <li id="nav-alerts"><a href="#" onclick="showTab('alerts')"><span class="nav-icon">◉</span> Алерты</a></li>
-      <li id="nav-config"><a href="#" onclick="showTab('config')"><span class="nav-icon">◎</span> Настройки</a></li>
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      <span>KvenzikAC</span>
+    </div>
+
+    <ul class="nav-list">
+      <li id="nav-dashboard" class="active">
+        <a href="#" onclick="showTab('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Главная
+        </a>
+      </li>
+      <li id="nav-alerts">
+        <a href="#" onclick="showTab('alerts')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Алерты
+          <span class="nav-badge" id="nav-badge" style="display:none">0</span>
+        </a>
+      </li>
+      <li id="nav-players">
+        <a href="#" onclick="showTab('players')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Игроки
+        </a>
+      </li>
+      <li id="nav-config">
+        <a href="#" onclick="showTab('config')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
+          Настройки
+        </a>
+      </li>
     </ul>
-    <div class="sidebar-user" id="sidebar-user"></div>
-    <div class="sidebar-footer">
-      <div class="status-dot" id="sidebar-dot"></div>
-      <span id="sidebar-status">Проверка...</span>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-user" id="sidebar-user"></div>
+      <div class="sidebar-footer">
+        <div class="status-dot" id="sidebar-dot"></div>
+        <span id="sidebar-status">Проверка...</span>
+        <span class="refresh-timer" id="refresh-timer"></span>
+      </div>
     </div>
   </nav>
 
   <main class="content">
-    <!-- Dashboard -->
+
+    <!-- ── Dashboard ── -->
     <div id="tab-dashboard">
       <div class="page-header">
-        <h1>Главная</h1>
-        <button class="btn-refresh" onclick="refreshDashboard()">↻ Обновить</button>
+        <div>
+          <h1>Главная</h1>
+          <p class="page-sub">Обзор системы в реальном времени</p>
+        </div>
+        <button class="btn-icon" onclick="refreshDashboard()" title="Обновить">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
       </div>
+
       <div class="cards">
-        <div class="card"><div class="card-label">Статус API</div><div class="card-value" id="api-status">—</div></div>
-        <div class="card"><div class="card-label">Модель</div><div class="card-value" id="model-status">—</div></div>
-        <div class="card"><div class="card-label">Фич в модели</div><div class="card-value" id="model-features">—</div></div>
-        <div class="card"><div class="card-label">Всего алертов</div><div class="card-value" id="alerts-total">—</div></div>
+        <div class="card card-accent">
+          <div class="card-icon card-icon-green">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="card-body">
+            <div class="card-label">Статус API</div>
+            <div class="card-value" id="api-status">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-purple">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <div class="card-body">
+            <div class="card-label">Модель</div>
+            <div class="card-value" id="model-status">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-blue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          </div>
+          <div class="card-body">
+            <div class="card-label">Фич в модели</div>
+            <div class="card-value" id="model-features">—</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-icon card-icon-red">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
+          <div class="card-body">
+            <div class="card-label">Всего алертов</div>
+            <div class="card-value" id="alerts-total">—</div>
+          </div>
+        </div>
       </div>
-      <div class="section-title">Последние алерты</div>
-      <table>
-        <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
-        <tbody id="recent-alerts-body"><tr><td colspan="3" class="empty">Нет данных</td></tr></tbody>
-      </table>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Алерты за 24ч</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-alerts"></canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Топ подозреваемых</span>
+          </div>
+          <div id="top-suspects"></div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:20px">
+        <div class="panel-header">
+          <span class="panel-title">Последние алерты</span>
+          <a href="#" class="panel-link" onclick="showTab('alerts')">Все →</a>
+        </div>
+        <table>
+          <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
+          <tbody id="recent-alerts-body"><tr><td colspan="3" class="empty">Нет данных</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
-    <!-- Alerts -->
+    <!-- ── Alerts ── -->
     <div id="tab-alerts" style="display:none">
       <div class="page-header">
-        <h1>Алерты</h1>
-        <div class="filters">
-          <input id="filter-player" type="text" placeholder="Фильтр по нику..." oninput="filterAlerts()"/>
-          <select id="filter-prob" onchange="filterAlerts()">
-            <option value="0">Все</option>
-            <option value="0.9">≥ 90%</option>
-            <option value="0.8">≥ 80%</option>
-            <option value="0.7">≥ 70%</option>
-          </select>
-          <button class="btn-refresh" onclick="loadAlerts()">↻</button>
+        <div>
+          <h1>Алерты</h1>
+          <p class="page-sub" id="alerts-subtitle">Загрузка...</p>
+        </div>
+        <div class="header-actions">
+          <div class="filters">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="filter-player" type="text" placeholder="Поиск по нику..." oninput="filterAlerts()"/>
+            </div>
+            <select id="filter-prob" onchange="filterAlerts()">
+              <option value="0">Все</option>
+              <option value="0.9">≥ 90%</option>
+              <option value="0.8">≥ 80%</option>
+              <option value="0.7">≥ 70%</option>
+            </select>
+          </div>
+          <button class="btn-icon" onclick="loadAlerts()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
         </div>
       </div>
-      <table>
-        <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
-        <tbody id="all-alerts-body"><tr><td colspan="3" class="empty">Загрузка...</td></tr></tbody>
-      </table>
-      <div id="alerts-count" class="alerts-count"></div>
+      <div class="panel">
+        <table>
+          <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
+          <tbody id="all-alerts-body"><tr><td colspan="3" class="empty">Загрузка...</td></tr></tbody>
+        </table>
+        <div id="alerts-count" class="table-footer"></div>
+      </div>
     </div>
 
-    <!-- Config -->
+    <!-- ── Players ── -->
+    <div id="tab-players" style="display:none">
+      <div class="page-header">
+        <div>
+          <h1>Игроки</h1>
+          <p class="page-sub">Статистика по подозреваемым</p>
+        </div>
+        <button class="btn-icon" onclick="loadPlayers()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+      </div>
+      <div id="players-grid" class="players-grid"></div>
+    </div>
+
+    <!-- ── Config ── -->
     <div id="tab-config" style="display:none">
-      <div class="page-header"><h1>Настройки</h1></div>
-      <div class="config-box">
-        <div class="config-group">
-          <label>Backend URL</label>
-          <input id="endpoint" type="text" placeholder="https://kvenzikac-backend.up.railway.app"/>
-          <div class="hint">Railway URL бэкенда</div>
+      <div class="page-header">
+        <div>
+          <h1>Настройки</h1>
+          <p class="page-sub">Подключение и параметры</p>
         </div>
-        <div class="config-group">
-          <label>API Key</label>
-          <input id="apikey" type="password" placeholder="dev-key"/>
+      </div>
+      <div class="config-layout">
+        <div class="config-box">
+          <div class="config-section-title">Подключение</div>
+          <div class="config-group">
+            <label>Backend URL</label>
+            <input id="endpoint" type="text" placeholder="https://kvenzikac-backend.up.railway.app"/>
+            <div class="hint">Railway URL бэкенда</div>
+          </div>
+          <div class="config-group">
+            <label>API Key</label>
+            <div class="input-wrap">
+              <input id="apikey" type="password" placeholder="dev-key"/>
+              <button class="btn-eye" onclick="toggleApiKey()" id="eye-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="config-actions">
+            <button class="btn-primary" onclick="saveConfig()">Сохранить и проверить</button>
+            <span id="config-msg"></span>
+          </div>
+          <div class="config-info" id="config-info"></div>
         </div>
-        <div class="config-actions">
-          <button class="btn-primary" onclick="saveConfig()">Сохранить и проверить</button>
-          <span id="config-msg"></span>
+        <div class="config-box">
+          <div class="config-section-title">Аккаунт</div>
+          <div id="account-info" class="account-info"></div>
+          <button class="btn-logout" onclick="logout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Выйти из аккаунта
+          </button>
         </div>
-        <div class="config-info" id="config-info"></div>
-        <hr style="border-color:#1c1c24; margin-top:8px"/>
-        <button class="btn-logout" onclick="logout()">Выйти из аккаунта</button>
       </div>
     </div>
+
   </main>
 </div>
 
