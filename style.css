@@ -954,3 +954,31 @@ tr:hover td { background: var(--surface2); }
   color: #fff;
 }
 .btn-buy-trial:hover { opacity: .85; }
+
+/* Login — Telegram */
+.login-or {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.login-or::before, .login-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+#tg-widget-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+}
+.tg-loading-text {
+  font-size: 13px;
+  color: var(--text2);
+  text-align: center;
+  padding: 10px 0;
+}
