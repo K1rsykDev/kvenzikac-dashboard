@@ -3,8 +3,11 @@ const BACKEND = "https://kvenzikac-backend.up.railway.app";
 // ── Auth ──────────────────────────────────────────────────────────────────────
 let currentUser = null;
 let currentApiKey = null;
+var _authChecked = false;
 
 async function checkAuth() {
+  if (_authChecked) return;
+  _authChecked = true;
   const params = new URLSearchParams(window.location.search);
   const urlToken = params.get("token");
   if (urlToken) {
@@ -30,7 +33,13 @@ async function checkAuth() {
     }
     const data = await res.json();
     if (data.authenticated) {
-      await showApp(data);
+      try {
+        await showApp(data);
+      } catch(appErr) {
+        console.error("KAC: showApp crashed", appErr);
+        // Показываем ошибку с деталями, но НЕ редиректим
+        showNetworkError("Ошибка загрузки интерфейса: " + (appErr && appErr.message ? appErr.message : String(appErr)));
+      }
     } else {
       localStorage.removeItem("kac_token");
       window.location.href = "login.html";
@@ -64,6 +73,7 @@ async function showApp(user) {
   var appEl = document.getElementById("app");
   if (!appEl) { console.error("KAC: #app not found"); return; }
   appEl.style.display = "flex";
+  console.log("KAC: showApp started, user=", user.username, "role=", user.role);
 
   try { buildLangSwitcher("lang-switcher-sidebar"); } catch(e) { console.error("KAC: buildLangSwitcher error", e); }
   try { applyLang(); } catch(e) { console.error("KAC: applyLang error", e); }
@@ -114,7 +124,7 @@ async function loadMyKey() {
     } else {
       currentApiKey = null;
     }
-  } catch {
+  } catch(e) {
     currentApiKey = localStorage.getItem("kac_apikey_cache") || null;
   }
 }
