@@ -6,8 +6,33 @@
 <title>KvenzikAC</title>
 <link rel="stylesheet" href="style.css"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="i18n.js"></script>
 </head>
 <body>
+
+<!-- Role Modal -->
+<div id="role-modal" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title" data-i18n="modal_role_title">Change Role</div>
+    <div class="modal-body">
+      <div class="modal-label" data-i18n="modal_role_select">Select role:</div>
+      <div class="role-options">
+        <label class="role-option">
+          <input type="radio" name="modal-role" value="user"/>
+          <span class="role-option-label"><span class="check-badge check-ai">user</span> <span data-i18n="role_user_label">User — no subscription</span></span>
+        </label>
+        <label class="role-option">
+          <input type="radio" name="modal-role" value="admin"/>
+          <span class="role-option-label"><span class="check-badge check-ban">admin</span> <span data-i18n="role_admin_label">Admin — full access</span></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeRoleModal()" data-i18n="modal_cancel">Cancel</button>
+      <button class="btn-primary" onclick="saveRoleModal()" data-i18n="modal_save">Save</button>
+    </div>
+  </div>
+</div>
 
 <div id="app" style="display:none">
   <nav class="sidebar">
@@ -21,53 +46,54 @@
       <li id="nav-dashboard" class="active">
         <a href="#" onclick="showTab('dashboard');return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-          Главная
+          <span data-i18n="nav_dashboard">Dashboard</span>
         </a>
       </li>
       <li id="nav-alerts">
         <a href="#" onclick="showTab('alerts');return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          Алерты
+          <span data-i18n="nav_alerts">Alerts</span>
           <span class="nav-badge" id="nav-badge" style="display:none">0</span>
         </a>
       </li>
       <li id="nav-players">
         <a href="#" onclick="showTab('players');return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Игроки
+          <span data-i18n="nav_players">Players</span>
         </a>
       </li>
       <li id="nav-bans">
         <a href="#" onclick="showTab('bans');return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-          Баны / Кики
+          <span data-i18n="nav_bans">Bans / Kicks</span>
           <span class="nav-badge nav-badge-red" id="nav-bans-badge" style="display:none">0</span>
         </a>
       </li>
       <li id="nav-connection">
         <a href="#" onclick="showTab('connection');return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          Подключение
+          <span data-i18n="nav_connection">Connection</span>
         </a>
       </li>
       <li id="nav-admin" style="display:none">
         <a href="#" onclick="showTab('admin');return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          Админ
+          <span data-i18n="nav_admin">Admin</span>
         </a>
       </li>
       <li id="nav-config">
         <a href="#" onclick="showTab('config');return false;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M19.07 19.07l-1.41-1.41M4.93 19.07l1.41-1.41"/></svg>
-          Настройки
+          <span data-i18n="nav_config">Settings</span>
         </a>
       </li>
     </ul>
     <div class="sidebar-bottom">
+      <div class="lang-switcher-sidebar" id="lang-switcher-sidebar"></div>
       <div class="sidebar-user" id="sidebar-user"></div>
       <div class="sidebar-footer">
         <div class="status-dot" id="sidebar-dot"></div>
-        <span id="sidebar-status">Проверка...</span>
+        <span id="sidebar-status" data-i18n="status_checking">Checking...</span>
         <span class="refresh-timer" id="refresh-timer"></span>
       </div>
     </div>
@@ -78,51 +104,51 @@
     <!-- ── Dashboard ── -->
     <div id="tab-dashboard">
       <div class="page-header">
-        <div><h1>Главная</h1><p class="page-sub">Обзор системы в реальном времени</p></div>
-        <button class="btn-icon" onclick="refreshDashboard()" title="Обновить">
+        <div><h1 data-i18n="page_dashboard">Dashboard</h1><p class="page-sub" data-i18n="page_dashboard_sub">System overview in real time</p></div>
+        <button class="btn-icon" onclick="refreshDashboard()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
         </button>
       </div>
       <div class="cards">
         <div class="card card-accent">
           <div class="card-icon card-icon-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-          <div class="card-body"><div class="card-label">Статус API</div><div class="card-value" id="api-status">—</div></div>
+          <div class="card-body"><div class="card-label" data-i18n="card_api">API Status</div><div class="card-value" id="api-status">—</div></div>
         </div>
         <div class="card">
           <div class="card-icon card-icon-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></div>
-          <div class="card-body"><div class="card-label">Модель</div><div class="card-value" id="model-status">—</div></div>
+          <div class="card-body"><div class="card-label" data-i18n="card_model">Model</div><div class="card-value" id="model-status">—</div></div>
         </div>
         <div class="card">
           <div class="card-icon card-icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-          <div class="card-body"><div class="card-label">Фич в модели</div><div class="card-value" id="model-features">—</div></div>
+          <div class="card-body"><div class="card-label" data-i18n="card_features">Model Features</div><div class="card-value" id="model-features">—</div></div>
         </div>
         <div class="card">
           <div class="card-icon card-icon-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
-          <div class="card-body"><div class="card-label">Всего алертов</div><div class="card-value" id="alerts-total">—</div></div>
+          <div class="card-body"><div class="card-label" data-i18n="card_alerts">Total Alerts</div><div class="card-value" id="alerts-total">—</div></div>
         </div>
         <div class="card">
           <div class="card-icon card-icon-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
-          <div class="card-body"><div class="card-label">Баны / Кики</div><div class="card-value" id="bans-total">—</div></div>
+          <div class="card-body"><div class="card-label" data-i18n="card_bans">Bans / Kicks</div><div class="card-value" id="bans-total">—</div></div>
         </div>
       </div>
       <div class="grid-2">
         <div class="panel">
-          <div class="panel-header"><span class="panel-title">Алерты за 24ч</span></div>
+          <div class="panel-header"><span class="panel-title" data-i18n="panel_alerts_24h">Alerts (24h)</span></div>
           <div class="chart-wrap"><canvas id="chart-alerts"></canvas></div>
         </div>
         <div class="panel">
-          <div class="panel-header"><span class="panel-title">Топ подозреваемых</span></div>
+          <div class="panel-header"><span class="panel-title" data-i18n="panel_top_suspects">Top Suspects</span></div>
           <div id="top-suspects"></div>
         </div>
       </div>
       <div class="panel" style="margin-top:20px">
         <div class="panel-header">
-          <span class="panel-title">Последние алерты</span>
-          <a href="#" class="panel-link" onclick="showTab('alerts');return false;">Все →</a>
+          <span class="panel-title" data-i18n="panel_recent">Recent Alerts</span>
+          <a href="#" class="panel-link" onclick="showTab('alerts');return false;" data-i18n="link_all">All →</a>
         </div>
         <table>
-          <thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
-          <tbody id="recent-alerts-body"><tr><td colspan="3" class="empty">Нет данных</td></tr></tbody>
+          <thead><tr><th data-i18n="col_player">Player</th><th data-i18n="col_prob">Probability</th><th data-i18n="col_time">Time</th></tr></thead>
+          <tbody id="recent-alerts-body"><tr><td colspan="3" class="empty" data-i18n="no_data">No data</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -130,23 +156,24 @@
     <!-- ── Alerts ── -->
     <div id="tab-alerts" style="display:none">
       <div class="page-header">
-        <div><h1>Алерты</h1><p class="page-sub" id="alerts-subtitle">Загрузка...</p></div>
+        <div><h1 data-i18n="page_alerts">Alerts</h1><p class="page-sub" id="alerts-subtitle"></p></div>
         <div class="header-actions">
           <div class="filters">
             <div class="search-wrap">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input id="filter-player" type="text" placeholder="Поиск по нику..." oninput="filterAlerts()"/>
+              <input id="filter-player" type="text" data-i18n-ph="search_nick" oninput="filterAlerts()"/>
             </div>
             <select id="filter-prob" onchange="filterAlerts()">
-              <option value="0">Все</option><option value="0.9">≥ 90%</option><option value="0.8">≥ 80%</option><option value="0.7">≥ 70%</option>
+              <option value="0" data-i18n="filter_all">All</option>
+              <option value="0.9">≥ 90%</option><option value="0.8">≥ 80%</option><option value="0.7">≥ 70%</option>
             </select>
           </div>
           <button class="btn-icon" onclick="loadAlerts()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
         </div>
       </div>
       <div class="panel">
-        <table><thead><tr><th>Игрок</th><th>Вероятность</th><th>Время</th></tr></thead>
-        <tbody id="all-alerts-body"><tr><td colspan="3" class="empty">Загрузка...</td></tr></tbody></table>
+        <table><thead><tr><th data-i18n="col_player">Player</th><th data-i18n="col_prob">Probability</th><th data-i18n="col_time">Time</th></tr></thead>
+        <tbody id="all-alerts-body"></tbody></table>
         <div id="alerts-count" class="table-footer"></div>
       </div>
     </div>
@@ -154,7 +181,7 @@
     <!-- ── Players ── -->
     <div id="tab-players" style="display:none">
       <div class="page-header">
-        <div><h1>Игроки</h1><p class="page-sub">Статистика по подозреваемым</p></div>
+        <div><h1 data-i18n="page_players">Players</h1><p class="page-sub" data-i18n="page_players_sub">Suspected players statistics</p></div>
         <button class="btn-icon" onclick="loadPlayers()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
       </div>
       <div id="players-grid" class="players-grid"></div>
@@ -163,23 +190,25 @@
     <!-- ── Bans/Kicks ── -->
     <div id="tab-bans" style="display:none">
       <div class="page-header">
-        <div><h1>Баны / Кики</h1><p class="page-sub" id="bans-subtitle">Загрузка...</p></div>
+        <div><h1 data-i18n="page_bans">Bans / Kicks</h1><p class="page-sub" id="bans-subtitle"></p></div>
         <div class="header-actions">
           <div class="filters">
             <div class="search-wrap">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input id="filter-ban-player" type="text" placeholder="Поиск по нику..." oninput="filterBans()"/>
+              <input id="filter-ban-player" type="text" data-i18n-ph="search_nick" oninput="filterBans()"/>
             </div>
             <select id="filter-ban-type" onchange="filterBans()">
-              <option value="">Все</option><option value="ban">Баны</option><option value="kick">Кики</option>
+              <option value="" data-i18n="filter_all_types">All</option>
+              <option value="ban" data-i18n="filter_bans">Bans</option>
+              <option value="kick" data-i18n="filter_kicks">Kicks</option>
             </select>
           </div>
           <button class="btn-icon" onclick="loadBans()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
         </div>
       </div>
       <div class="panel">
-        <table><thead><tr><th>Игрок</th><th>Тип</th><th>Чек</th><th>Вероятность</th><th>Причина</th><th>Время</th></tr></thead>
-        <tbody id="bans-body"><tr><td colspan="6" class="empty">Загрузка...</td></tr></tbody></table>
+        <table><thead><tr><th data-i18n="col_player">Player</th><th data-i18n="col_type">Type</th><th data-i18n="col_check">Check</th><th data-i18n="col_prob">Probability</th><th data-i18n="col_reason">Reason</th><th data-i18n="col_time">Time</th></tr></thead>
+        <tbody id="bans-body"></tbody></table>
         <div id="bans-count" class="table-footer"></div>
       </div>
     </div>
@@ -187,123 +216,105 @@
     <!-- ── Connection ── -->
     <div id="tab-connection" style="display:none">
       <div class="page-header">
-        <div><h1>Подключение к серверу</h1><p class="page-sub">Ваш API ключ и endpoint для плагина</p></div>
+        <div><h1 data-i18n="page_conn">Server Connection</h1><p class="page-sub" data-i18n="page_conn_sub">Your API key and endpoint for the plugin</p></div>
       </div>
       <div class="conn-layout">
         <div class="conn-box">
-          <div class="config-section-title">Данные подключения</div>
-          <div class="conn-info-row">
-            <div class="conn-info-label">Статус ключа</div>
-            <span id="conn-status" class="conn-key-status">—</span>
-          </div>
-          <div class="conn-info-row">
-            <div class="conn-info-label">Подписка</div>
-            <span id="conn-sub-days">—</span>
-          </div>
-          <div class="conn-info-row">
-            <div class="conn-info-label">Тариф</div>
-            <span id="conn-plan">—</span>
-          </div>
-          <div class="conn-info-row">
-            <div class="conn-info-label">Срок действия</div>
-            <span id="conn-expires">—</span>
-          </div>
+          <div class="config-section-title" data-i18n="key_status">Key Status</div>
+          <div class="conn-info-row"><div class="conn-info-label" data-i18n="key_status">Key Status</div><span id="conn-status" class="conn-key-status">—</span></div>
+          <div class="conn-info-row"><div class="conn-info-label" data-i18n="subscription">Subscription</div><span id="conn-sub-days">—</span></div>
+          <div class="conn-info-row"><div class="conn-info-label" data-i18n="plan_label">Plan</div><span id="conn-plan">—</span></div>
+          <div class="conn-info-row"><div class="conn-info-label" data-i18n="expires">Expires</div><span id="conn-expires">—</span></div>
           <div class="config-group" style="margin-top:8px">
-            <label>Backend Endpoint</label>
+            <label data-i18n="endpoint_label">Backend Endpoint</label>
             <div class="input-copy-wrap">
               <input id="conn-endpoint" type="text" readonly/>
-              <button class="btn-copy" onclick="copyToClipboard('conn-endpoint')">Копировать</button>
+              <button class="btn-copy" onclick="copyToClipboard('conn-endpoint')" data-i18n="copy">Copy</button>
             </div>
           </div>
           <div class="config-group">
-            <label>API Key</label>
+            <label data-i18n="apikey_label">API Key</label>
             <div class="input-copy-wrap">
-              <input id="conn-key" type="text" readonly placeholder="Нет ключа"/>
-              <button class="btn-copy" onclick="copyToClipboard('conn-key')">Копировать</button>
+              <input id="conn-key" type="text" readonly placeholder="—"/>
+              <button class="btn-copy" onclick="copyToClipboard('conn-key')" data-i18n="copy">Copy</button>
             </div>
           </div>
           <div class="config-group">
-            <label>Название сервера</label>
-            <input id="conn-server-name" type="text" placeholder="Мой сервер"/>
+            <label data-i18n="server_name_label">Server Name</label>
+            <input id="conn-server-name" type="text" placeholder="My Server"/>
           </div>
           <div id="trial-block" style="margin-top:4px"></div>
           <div class="config-actions" style="margin-top:4px">
-            <button class="btn-primary" onclick="generateKey()" id="btn-gen-key">Сгенерировать ключ</button>
-            <button class="btn-secondary" onclick="loadConnectionTab()">↻ Обновить</button>
+            <button class="btn-primary" onclick="generateKey()" id="btn-gen-key" data-i18n="btn_generate">Generate Key</button>
+            <button class="btn-secondary" onclick="loadConnectionTab()" data-i18n="btn_refresh">↻ Refresh</button>
           </div>
-          <div class="hint" style="margin-top:8px">Ключ действует столько дней, сколько у вас подписки. После истечения нужно продлить подписку и сгенерировать новый.</div>
+          <div class="hint" style="margin-top:8px" data-i18n="hint_key"></div>
         </div>
         <div class="conn-box">
-          <div class="config-section-title">Как подключить плагин</div>
+          <div class="config-section-title" data-i18n="guide_title">How to connect the plugin</div>
           <div class="conn-guide">
-            <div class="conn-guide-step"><span class="conn-step-num">1</span><span>Скачайте <strong>KvenzikAC.jar</strong> и положите в папку <code>plugins/</code></span></div>
-            <div class="conn-guide-step"><span class="conn-step-num">2</span><span>Запустите сервер — создастся <code>plugins/KvenzikAC/config.yml</code></span></div>
-            <div class="conn-guide-step"><span class="conn-step-num">3</span><span>Вставьте в config.yml:</span></div>
+            <div class="conn-guide-step"><span class="conn-step-num">1</span><span data-i18n="guide_1">Download KvenzikAC.jar and put it in plugins/</span></div>
+            <div class="conn-guide-step"><span class="conn-step-num">2</span><span data-i18n="guide_2">Start the server</span></div>
+            <div class="conn-guide-step"><span class="conn-step-num">3</span><span data-i18n="guide_3">Insert into config.yml:</span></div>
             <div class="conn-code-block">
               <code>endpoint: <span id="guide-endpoint">https://kvenzikac-backend.up.railway.app</span></code><br/>
-              <code>api-key: <span id="guide-key">ВАШ_КЛЮЧ</span></code>
+              <code>api-key: <span id="guide-key">YOUR_KEY</span></code>
             </div>
-            <div class="conn-guide-step"><span class="conn-step-num">4</span><span>Перезапустите сервер или выполните <code>/kac reload</code></span></div>
+            <div class="conn-guide-step"><span class="conn-step-num">4</span><span data-i18n="guide_4">Restart or /kac reload</span></div>
           </div>
         </div>
         <div class="conn-box conn-pricing">
-          <div class="config-section-title">Тарифы</div>
+          <div class="config-section-title" data-i18n="pricing_title">Plans</div>
           <div class="pricing-cards">
             <div class="pricing-card">
-              <div class="pricing-name">Пробный</div>
-              <div class="pricing-price">Бесплатно</div>
-              <div class="pricing-days">3 дня</div>
+              <div class="pricing-name" data-i18n="plan_free_name">Trial</div>
+              <div class="pricing-price" data-i18n="plan_free_price">Free</div>
+              <div class="pricing-days" data-i18n="plan_free_days">3 days</div>
               <ul class="pricing-features">
-                <li>✓ AI-детекция читов</li>
-                <li>✓ Дашборд</li>
-                <li>✓ Алерты и баны</li>
+                <li>✓ AI cheat detection</li><li>✓ Dashboard</li><li>✓ Alerts & bans</li>
               </ul>
               <div id="pricing-trial-btn" style="margin-top:12px"></div>
             </div>
             <div class="pricing-card pricing-card-accent">
-              <div class="pricing-name">Базовый</div>
+              <div class="pricing-name" data-i18n="plan_basic_name">Basic</div>
               <div class="pricing-price">$3</div>
-              <div class="pricing-days">30 дней</div>
+              <div class="pricing-days" data-i18n="plan_basic_days">30 days</div>
               <ul class="pricing-features">
-                <li>✓ Всё из пробного</li>
-                <li>✓ Приоритетная поддержка</li>
-                <li>✓ Обновления модели</li>
+                <li>✓ Everything in Trial</li><li>✓ Priority support</li><li>✓ Model updates</li>
               </ul>
-              <button class="btn-buy" onclick="alert('Напишите администратору для покупки Basic')">Купить</button>
+              <button class="btn-buy" onclick="alert(t('pricing_hint'))" data-i18n="btn_buy">Buy</button>
             </div>
             <div class="pricing-card">
-              <div class="pricing-name">Премиум</div>
+              <div class="pricing-name" data-i18n="plan_premium_name">Premium</div>
               <div class="pricing-price">$8</div>
-              <div class="pricing-days">90 дней</div>
+              <div class="pricing-days" data-i18n="plan_premium_days">90 days</div>
               <ul class="pricing-features">
-                <li>✓ Всё из базового</li>
-                <li>✓ Кастомные пороги</li>
-                <li>✓ Ранний доступ</li>
+                <li>✓ Everything in Basic</li><li>✓ Custom thresholds</li><li>✓ Early access</li>
               </ul>
-              <button class="btn-buy" onclick="alert('Напишите администратору для покупки Premium')">Купить</button>
+              <button class="btn-buy" onclick="alert(t('pricing_hint'))" data-i18n="btn_buy">Buy</button>
             </div>
           </div>
-          <div class="hint" style="margin-top:12px">Для покупки напишите в Discord администратору.</div>
+          <div class="hint" style="margin-top:12px" data-i18n="pricing_hint"></div>
         </div>
       </div>
     </div>
 
     <!-- ── Config ── -->
     <div id="tab-config" style="display:none">
-      <div class="page-header"><div><h1>Настройки</h1><p class="page-sub">Информация об аккаунте</p></div></div>
+      <div class="page-header"><div><h1 data-i18n="page_config">Settings</h1><p class="page-sub" data-i18n="page_config_sub">Account information</p></div></div>
       <div class="config-layout">
         <div class="config-box">
-          <div class="config-section-title">Аккаунт</div>
+          <div class="config-section-title" data-i18n="section_account">Account</div>
           <div id="account-info" class="account-info"></div>
           <button class="btn-logout" onclick="logout()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            Выйти из аккаунта
+            <span data-i18n="btn_logout">Sign out</span>
           </button>
         </div>
         <div class="config-box">
-          <div class="config-section-title">Проверка подключения</div>
+          <div class="config-section-title" data-i18n="section_connection_check">Connection Check</div>
           <div class="config-actions">
-            <button class="btn-primary" onclick="checkConnection()">Проверить</button>
+            <button class="btn-primary" onclick="checkConnection()" data-i18n="btn_check">Check</button>
             <span id="config-msg"></span>
           </div>
           <div class="config-info" id="config-info"></div>
@@ -313,43 +324,53 @@
 
     <!-- ── Admin ── -->
     <div id="tab-admin" style="display:none">
-      <div class="page-header"><div><h1>Админ панель</h1><p class="page-sub">Управление пользователями и моделью</p></div>
+      <div class="page-header">
+        <div><h1 data-i18n="page_admin">Admin Panel</h1><p class="page-sub" data-i18n="page_admin_sub">User and model management</p></div>
         <button class="btn-icon" onclick="loadAdminTab()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>
       </div>
-
       <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><span class="panel-title">Пользователи</span></div>
+        <div class="panel-header"><span class="panel-title" data-i18n="section_users">Users</span></div>
         <table>
-          <thead><tr><th>Ник</th><th>Discord ID</th><th>Роль</th><th>Тариф</th><th>Подписка</th><th>Сервер</th><th>Действия</th></tr></thead>
-          <tbody id="admin-users-body"><tr><td colspan="7" class="empty">Загрузка...</td></tr></tbody>
+          <thead><tr>
+            <th data-i18n="col_nick">Nick</th><th data-i18n="col_discord_id">Discord ID</th>
+            <th data-i18n="col_role">Role</th><th data-i18n="col_plan">Plan</th>
+            <th data-i18n="col_sub">Subscription</th><th data-i18n="col_server">Server</th>
+            <th data-i18n="col_actions">Actions</th>
+          </tr></thead>
+          <tbody id="admin-users-body"></tbody>
         </table>
       </div>
-
       <div class="panel" style="margin-bottom:20px">
-        <div class="panel-header"><span class="panel-title">Серверы</span></div>
+        <div class="panel-header"><span class="panel-title" data-i18n="section_servers">Servers</span></div>
         <table>
-          <thead><tr><th>Сервер</th><th>Владелец</th><th>API Key</th><th>Статус</th><th>Статистика</th></tr></thead>
-          <tbody id="admin-servers-body"><tr><td colspan="5" class="empty">Загрузка...</td></tr></tbody>
+          <thead><tr>
+            <th data-i18n="col_server">Server</th><th data-i18n="col_owner">Owner</th>
+            <th data-i18n="col_key">API Key</th><th data-i18n="col_status">Status</th>
+            <th data-i18n="col_stats">Stats</th>
+          </tr></thead>
+          <tbody id="admin-servers-body"></tbody>
         </table>
       </div>
-
       <div class="panel">
         <div class="panel-header">
-          <span class="panel-title">Дообучение модели</span>
+          <span class="panel-title" data-i18n="section_retrain">Model Retraining</span>
           <span id="admin-samples-count" style="font-size:12px;color:var(--text2)"></span>
         </div>
         <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
           <div id="retrain-status-text" style="font-size:13px;color:var(--text2);margin-bottom:12px">—</div>
           <div class="config-actions">
-            <button class="btn-primary" onclick="doRetrain()" id="btn-retrain">▶ Переобучить</button>
-            <button class="btn-secondary" onclick="refreshRetrainStatus()">↻ Статус</button>
-            <button class="btn-danger" onclick="clearAllSamples()">✕ Очистить все</button>
+            <button class="btn-primary" onclick="doRetrain()" id="btn-retrain" data-i18n="btn_retrain">▶ Retrain</button>
+            <button class="btn-secondary" onclick="refreshRetrainStatus()" data-i18n="btn_status">↻ Status</button>
+            <button class="btn-danger" onclick="clearAllSamples()" data-i18n="btn_clear_all">✕ Clear all</button>
           </div>
-          <div class="hint" style="margin-top:8px">Мин. 10 сэмплов (3+ каждого класса). Разметка через плагин: <code>/kac label &lt;игрок&gt; &lt;cheat|legit&gt;</code></div>
+          <div class="hint" style="margin-top:8px" data-i18n="hint_retrain"></div>
         </div>
         <table>
-          <thead><tr><th>Игрок</th><th>Метка</th><th>Время</th><th>Действие</th></tr></thead>
-          <tbody id="admin-samples-body"><tr><td colspan="4" class="empty">Загрузка...</td></tr></tbody>
+          <thead><tr>
+            <th data-i18n="col_player">Player</th><th data-i18n="col_label">Label</th>
+            <th data-i18n="col_time">Time</th><th data-i18n="col_action">Action</th>
+          </tr></thead>
+          <tbody id="admin-samples-body"></tbody>
         </table>
       </div>
     </div>
