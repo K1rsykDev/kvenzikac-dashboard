@@ -663,6 +663,7 @@ async function loadAdminUsers() {
           "<button class='btn-sm btn-warn' onclick='adminAddSub(\"" + u.discord_id + "\", -7)'>-7" + t("days") + "</button>" +
           "<button class='btn-sm btn-danger' onclick='adminAddSub(\"" + u.discord_id + "\", -999)'>" + t("btn_reset") + "</button>" +
           "<button class='btn-sm btn-accent' onclick='openRoleModal(\"" + u.discord_id + "\", \"" + u.role + "\")'>" + t("btn_change_role") + "</button>" +
+          "<button class='btn-sm btn-plan' onclick='openPlanModal(\"" + u.discord_id + "\", \"" + (u.plan || "none") + "\")'>" + t("btn_change_plan") + "</button>" +
         "</td>";
       tbody.appendChild(tr);
     });
@@ -684,7 +685,41 @@ async function adminAddSub(discordId, days) {
   } catch(e) { alert("Connection error"); }
 }
 
-// ── Role Modal ────────────────────────────────────────────────────────────────
+// ── Plan Modal ────────────────────────────────────────────────────────────────
+var _planModalDiscordId = null;
+
+function openPlanModal(discordId, currentPlan) {
+  _planModalDiscordId = discordId;
+  var modal = document.getElementById("plan-modal");
+  if (!modal) return;
+  var radios = modal.querySelectorAll("input[name='modal-plan']");
+  radios.forEach(function(r) { r.checked = r.value === (currentPlan || "none"); });
+  applyLang();
+  modal.style.display = "flex";
+}
+
+function closePlanModal() {
+  var modal = document.getElementById("plan-modal");
+  if (modal) modal.style.display = "none";
+  _planModalDiscordId = null;
+}
+
+async function savePlanModal() {
+  if (!_planModalDiscordId) return;
+  var selected = document.querySelector("input[name='modal-plan']:checked");
+  if (!selected) return;
+  var newPlan = selected.value;
+  try {
+    var res = await fetch(BACKEND + "/admin/plan", {
+      method: "POST",
+      headers: Object.assign({ "Content-Type": "application/json" }, authHeaders()),
+      body: JSON.stringify({ discord_id: _planModalDiscordId, plan: newPlan })
+    });
+    if (!res.ok) { var d = await res.json(); alert("Error: " + (d.detail || res.status)); return; }
+    closePlanModal();
+    loadAdminUsers();
+  } catch(e) { alert("Connection error"); }
+}
 var _roleModalDiscordId = null;
 
 function openRoleModal(discordId, currentRole) {

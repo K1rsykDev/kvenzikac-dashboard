@@ -79,8 +79,9 @@ var LANGS = {
     modal_cancel: "Cancel", modal_save: "Save",
     role_user_label: "User — no subscription",
     role_admin_label: "Admin — full access",
+    modal_plan_title: "Change Plan", modal_plan_select: "Select plan:",
+    btn_change_plan: "Change Plan",
   },
-  ru: {
     flag: "🇷🇺", name: "Русский",
     nav_dashboard: "Главная", nav_alerts: "Алерты", nav_players: "Игроки",
     nav_bans: "Баны / Кики", nav_connection: "Подключение", nav_admin: "Админ", nav_config: "Настройки",
@@ -149,6 +150,8 @@ var LANGS = {
     modal_cancel: "Отмена", modal_save: "Сохранить",
     role_user_label: "User — без подписки",
     role_admin_label: "Admin — полный доступ",
+    modal_plan_title: "Изменить тариф", modal_plan_select: "Выберите тариф:",
+    btn_change_plan: "Изменить тариф",
   },
   uk: {
     flag: "🇺🇦", name: "Українська",
@@ -219,6 +222,8 @@ var LANGS = {
     modal_cancel: "Скасувати", modal_save: "Зберегти",
     role_user_label: "User — без підписки",
     role_admin_label: "Admin — повний доступ",
+    modal_plan_title: "Змінити тариф", modal_plan_select: "Оберіть тариф:",
+    btn_change_plan: "Змінити тариф",
   },
   pl: {
     flag: "🇵🇱", name: "Polski",
@@ -289,6 +294,8 @@ var LANGS = {
     modal_cancel: "Anuluj", modal_save: "Zapisz",
     role_user_label: "User — bez subskrypcji",
     role_admin_label: "Admin — pełny dostęp",
+    modal_plan_title: "Zmień plan", modal_plan_select: "Wybierz plan:",
+    btn_change_plan: "Zmień plan",
   }
 };
 
@@ -303,11 +310,19 @@ function setLang(lang) {
   currentLang = lang;
   localStorage.setItem("kac_lang", lang);
   applyLang();
-  // Обновляем switcher
-  document.querySelectorAll(".lang-option").forEach(function(el) {
-    el.classList.toggle("active", el.dataset.lang === lang);
+  // Перерисовываем все switcher'ы
+  document.querySelectorAll("[id^='lang-switcher-']").forEach(function(el) {
+    if (el._renderLang) el._renderLang();
   });
 }
+
+// Закрывать дропдаун при клике вне
+document.addEventListener("click", function(e) {
+  if (!e.target.closest(".lang-dropdown")) {
+    document.querySelectorAll(".lang-menu").forEach(function(m) { m.style.display = "none"; });
+    document.querySelectorAll(".lang-trigger").forEach(function(b) { b.classList.remove("open"); });
+  }
+});
 
 function applyLang() {
   document.querySelectorAll("[data-i18n]").forEach(function(el) {
@@ -322,10 +337,50 @@ function applyLang() {
 function buildLangSwitcher(containerId) {
   var el = document.getElementById(containerId);
   if (!el) return;
-  el.innerHTML = Object.keys(LANGS).map(function(lang) {
-    return '<button class="lang-option' + (lang === currentLang ? " active" : "") + '" ' +
-      'data-lang="' + lang + '" onclick="setLang(\'' + lang + '\')" title="' + LANGS[lang].name + '">' +
-      LANGS[lang].flag +
-    '</button>';
-  }).join("");
+
+  function render() {
+    var lang = currentLang;
+    var isTopRight = containerId === "lang-switcher-topright";
+    el.innerHTML =
+      '<div class="lang-dropdown">' +
+        '<button class="lang-trigger" onclick="toggleLangDropdown(\'' + containerId + '\')">' +
+          '<span class="lang-flag">' + LANGS[lang].flag + '</span>' +
+          '<span class="lang-name">' + LANGS[lang].name + '</span>' +
+          '<svg class="lang-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>' +
+        '</button>' +
+        '<div class="lang-menu" id="lang-menu-' + containerId + '" style="display:none">' +
+          Object.keys(LANGS).map(function(l) {
+            return '<button class="lang-menu-item' + (l === lang ? ' active' : '') + '" onclick="setLang(\'' + l + '\');closeLangDropdown(\'' + containerId + '\')">' +
+              '<span class="lang-flag">' + LANGS[l].flag + '</span>' +
+              '<span class="lang-name">' + LANGS[l].name + '</span>' +
+            '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+  }
+
+  render();
+  // Перерисовываем при смене языка
+  el._renderLang = render;
+}
+
+function toggleLangDropdown(containerId) {
+  var menu = document.getElementById("lang-menu-" + containerId);
+  if (!menu) return;
+  var isOpen = menu.style.display !== "none";
+  // Закрываем все открытые
+  document.querySelectorAll(".lang-menu").forEach(function(m) { m.style.display = "none"; });
+  document.querySelectorAll(".lang-trigger").forEach(function(b) { b.classList.remove("open"); });
+  if (!isOpen) {
+    menu.style.display = "block";
+    var btn = menu.previousElementSibling;
+    if (btn) btn.classList.add("open");
+  }
+}
+
+function closeLangDropdown(containerId) {
+  var menu = document.getElementById("lang-menu-" + containerId);
+  if (menu) menu.style.display = "none";
+  var trigger = menu && menu.previousElementSibling;
+  if (trigger) trigger.classList.remove("open");
 }

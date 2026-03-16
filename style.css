@@ -868,6 +868,8 @@ tr:hover td { background: var(--surface2); }
 .btn-sm.btn-danger:hover { background: rgba(248,113,113,.25); }
 .btn-sm.btn-accent { background: var(--purple-dim); color: var(--accent); border-color: rgba(124,106,247,.2); }
 .btn-sm.btn-accent:hover { background: rgba(124,106,247,.25); }
+.btn-sm.btn-plan { background: rgba(251,191,36,.1); color: var(--warn); border-color: rgba(251,191,36,.2); }
+.btn-sm.btn-plan:hover { background: rgba(251,191,36,.2); }
 
 /* Type badges */
 .check-ban  { background: var(--high-dim);   color: var(--high); }
@@ -1047,31 +1049,85 @@ tr:hover td { background: var(--surface2); }
    LANG SWITCHER
 ══════════════════════════════════════ */
 .lang-switcher-sidebar {
-  display: flex;
-  gap: 4px;
-  padding: 10px 10px 6px;
-  flex-wrap: wrap;
+  padding: 8px 10px 4px;
 }
-.lang-option {
-  background: none;
-  border: 1px solid transparent;
-  border-radius: 7px;
-  padding: 4px 7px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all .15s;
-  line-height: 1;
-  opacity: .5;
-}
-.lang-option:hover { opacity: 1; border-color: var(--border2); background: var(--surface2); }
-.lang-option.active { opacity: 1; border-color: var(--accent); background: var(--purple-dim); }
-
-/* Top-right lang switcher for login page */
 .lang-switcher-topright {
   position: fixed;
   top: 16px;
   right: 20px;
-  z-index: 10;
-  display: flex;
-  gap: 4px;
+  z-index: 100;
 }
+
+.lang-dropdown {
+  position: relative;
+}
+
+.lang-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 7px 12px;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all .15s;
+  width: 100%;
+}
+.lang-trigger:hover,
+.lang-trigger.open {
+  border-color: var(--accent);
+  background: var(--purple-dim);
+  color: var(--accent);
+}
+.lang-flag { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.lang-name { flex: 1; text-align: left; }
+.lang-arrow {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  transition: transform .2s;
+}
+.lang-trigger.open .lang-arrow { transform: rotate(180deg); }
+
+.lang-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  min-width: 160px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.5);
+  z-index: 200;
+}
+/* For top-right switcher — dropdown goes down */
+.lang-switcher-topright .lang-menu {
+  bottom: auto;
+  top: calc(100% + 6px);
+  left: auto;
+  right: 0;
+}
+
+.lang-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all .12s;
+  text-align: left;
+}
+.lang-menu-item:hover { background: var(--border); color: var(--text); }
+.lang-menu-item.active { background: var(--purple-dim); color: var(--accent); }

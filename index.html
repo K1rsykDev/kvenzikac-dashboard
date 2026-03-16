@@ -34,6 +34,38 @@
   </div>
 </div>
 
+<!-- Plan Modal -->
+<div id="plan-modal" class="modal-overlay" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title" data-i18n="modal_plan_title">Change Plan</div>
+    <div class="modal-body">
+      <div class="modal-label" data-i18n="modal_plan_select">Select plan:</div>
+      <div class="role-options">
+        <label class="role-option">
+          <input type="radio" name="modal-plan" value="none"/>
+          <span class="role-option-label"><span class="plan-badge plan-none">none</span> <span data-i18n="plan_none">No subscription</span></span>
+        </label>
+        <label class="role-option">
+          <input type="radio" name="modal-plan" value="free"/>
+          <span class="role-option-label"><span class="plan-badge plan-free">free</span> <span data-i18n="plan_free">Free (trial)</span></span>
+        </label>
+        <label class="role-option">
+          <input type="radio" name="modal-plan" value="basic"/>
+          <span class="role-option-label"><span class="plan-badge plan-basic">basic</span> <span data-i18n="plan_basic">Basic</span></span>
+        </label>
+        <label class="role-option">
+          <input type="radio" name="modal-plan" value="premium"/>
+          <span class="role-option-label"><span class="plan-badge plan-premium">premium</span> <span data-i18n="plan_premium">Premium</span></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closePlanModal()" data-i18n="modal_cancel">Cancel</button>
+      <button class="btn-primary" onclick="savePlanModal()" data-i18n="modal_save">Save</button>
+    </div>
+  </div>
+</div>
+
 <div id="app" style="display:none">
   <nav class="sidebar">
     <div class="logo">
