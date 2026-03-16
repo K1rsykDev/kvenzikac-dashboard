@@ -42,10 +42,12 @@ async function checkAuth() {
 }
 
 function showNetworkError(msg) {
+  document.body.style.margin = "0";
   document.body.innerHTML =
-    '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#080810;color:#e2e2ee;font-family:system-ui;flex-direction:column;gap:16px">' +
+    '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;width:100%;background:#080810;color:#e2e2ee;font-family:system-ui;flex-direction:column;gap:16px;box-sizing:border-box">' +
       '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
-      '<div style="font-size:16px;color:#f87171">' + msg + '</div>' +
+      '<div style="font-size:16px;color:#f87171;text-align:center;max-width:360px;padding:0 16px">' + msg + '</div>' +
+      '<div style="font-size:12px;color:#4a4a62;text-align:center;max-width:320px;padding:0 16px">Сервер мог уйти в спящий режим. Нажмите «Повторить» — обычно помогает через 5-10 секунд.</div>' +
       '<button onclick="location.reload()" style="background:#7c6af7;border:none;color:#fff;padding:10px 24px;border-radius:9px;cursor:pointer;font-size:14px">Повторить</button>' +
       '<button onclick="localStorage.removeItem(\'kac_token\');location.href=\'login.html\'" style="background:transparent;border:1px solid #4a4a62;color:#9898b0;padding:8px 20px;border-radius:9px;cursor:pointer;font-size:13px">Выйти</button>' +
     '</div>';
