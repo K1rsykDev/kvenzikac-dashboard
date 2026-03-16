@@ -15,6 +15,19 @@ async function checkAuth() {
   if (!token) { window.location.href = "login.html"; return; }
   try {
     const res  = await fetch(BACKEND + "/auth/verify?token=" + token);
+    // Если бэкенд вернул не-JSON или упал — не трогаем токен
+    if (!res.ok) {
+      // 401/403 — токен точно невалидный, чистим
+      if (res.status === 401 || res.status === 403) {
+        localStorage.removeItem("kac_token");
+        window.location.href = "login.html";
+      }
+      // Другие ошибки (500, 502, 503) — показываем ошибку, не редиректим
+      else {
+        showNetworkError("Сервер недоступен (HTTP " + res.status + "). Попробуйте позже.");
+      }
+      return;
+    }
     const data = await res.json();
     if (data.authenticated) {
       await showApp(data);
@@ -22,9 +35,20 @@ async function checkAuth() {
       localStorage.removeItem("kac_token");
       window.location.href = "login.html";
     }
-  } catch {
-    window.location.href = "login.html";
+  } catch(e) {
+    // Сетевая ошибка (CORS, таймаут, офлайн) — НЕ удаляем токен, показываем ошибку
+    showNetworkError("Не удалось подключиться к серверу. Проверьте интернет.");
   }
+}
+
+function showNetworkError(msg) {
+  document.body.innerHTML =
+    '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#080810;color:#e2e2ee;font-family:system-ui;flex-direction:column;gap:16px">' +
+      '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+      '<div style="font-size:16px;color:#f87171">' + msg + '</div>' +
+      '<button onclick="location.reload()" style="background:#7c6af7;border:none;color:#fff;padding:10px 24px;border-radius:9px;cursor:pointer;font-size:14px">Повторить</button>' +
+      '<button onclick="localStorage.removeItem(\'kac_token\');location.href=\'login.html\'" style="background:transparent;border:1px solid #4a4a62;color:#9898b0;padding:8px 20px;border-radius:9px;cursor:pointer;font-size:13px">Выйти</button>' +
+    '</div>';
 }
 
 async function logout() {

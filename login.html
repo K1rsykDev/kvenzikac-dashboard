@@ -67,7 +67,28 @@
 
 <script>
 const BACKEND = "https://kvenzikac-backend.up.railway.app";
-if (localStorage.getItem("kac_token")) window.location.href = "index.html";
+
+// Если токен есть — проверяем его валидность перед редиректом
+(async function() {
+  var token = localStorage.getItem("kac_token");
+  if (!token) return; // нет токена — остаёмся на логине
+  try {
+    var res = await fetch(BACKEND + "/auth/verify?token=" + token);
+    if (!res.ok) {
+      // Бэкенд вернул ошибку — если 401/403 чистим токен, иначе просто остаёмся
+      if (res.status === 401 || res.status === 403) localStorage.removeItem("kac_token");
+      return;
+    }
+    var data = await res.json();
+    if (data.authenticated) {
+      window.location.href = "index.html";
+    } else {
+      localStorage.removeItem("kac_token");
+    }
+  } catch(e) {
+    // Сеть недоступна — остаёмся на логине, не трогаем токен
+  }
+})();
 
 buildLangSwitcher("lang-switcher-topright");
 applyLang();
