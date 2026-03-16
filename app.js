@@ -59,10 +59,12 @@ async function logout() {
 
 async function showApp(user) {
   currentUser = user;
-  document.getElementById("app").style.display = "flex";
+  var appEl = document.getElementById("app");
+  if (!appEl) { console.error("KAC: #app not found"); return; }
+  appEl.style.display = "flex";
 
-  buildLangSwitcher("lang-switcher-sidebar");
-  applyLang();
+  try { buildLangSwitcher("lang-switcher-sidebar"); } catch(e) { console.error("KAC: buildLangSwitcher error", e); }
+  try { applyLang(); } catch(e) { console.error("KAC: applyLang error", e); }
 
   var avatarUrl = user.avatar
     ? "https://cdn.discordapp.com/avatars/" + user.id + "/" + user.avatar + ".png"

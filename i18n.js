@@ -82,6 +82,7 @@ var LANGS = {
     modal_plan_title: "Change Plan", modal_plan_select: "Select plan:",
     btn_change_plan: "Change Plan",
   },
+  ru: {
     flag: "🇷🇺", name: "Русский",
     nav_dashboard: "Главная", nav_alerts: "Алерты", nav_players: "Игроки",
     nav_bans: "Баны / Кики", nav_connection: "Подключение", nav_admin: "Админ", nav_config: "Настройки",
